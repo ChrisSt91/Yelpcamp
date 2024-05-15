@@ -2,15 +2,16 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
-const Campground = require("./models/campground");
 const ejsMate = require("ejs-mate");
-const app = express();
 const flash = require("connect-flash");
 const cookieParser = require("cookie-parser");
 const joi = require("joi");
 const appError = require("./utils/errorHandling/appError");
 
-const routes = require("./routes/routes");
+const app = express();
+
+const campgrounds = require("./routes/campground.js");
+const reviews = require("./routes/review.js");
 
 main().catch((err) => console.log("OH NO, MONGODB ERROR!", err));
 
@@ -28,14 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(flash());
 app.use(cookieParser("thisisasecret"));
-// app.use((req, res, next) => {
-//     req.requestTime = Date.now();
-//     console.log(req.method, req.path);
-//     console.log(req.query);
-//     return next();
-// })
 
-app.use("/", routes);
+app.use("/campgrounds", campgrounds);
+app.use("/campgrounds/:id/reviews", reviews);
 
 app.use((err, req, res, next) => {
 	let status = 500;
@@ -51,21 +47,6 @@ app.use((err, req, res, next) => {
 
 	res.status(status).render("error", { message, status, stack: err.stack, err });
 });
-
-// app.use((err, req, res, next) => {
-//     let status = 500;
-//     let message = 'Something went wrong!';
-
-//     if (err === appError) {
-//         status = err.status;
-//         message = err.message || 'Something went wrong';
-//     } else if (err.name === 'CastError') {
-//         status = 400;
-//         message = "Cast Failed";
-//     }
-
-//     res.status(status).render('error', { message, status, stack: err.stack, err });
-// });
 
 app.listen(3000, () => {
 	console.log("SERVING ON PORT 3000");
