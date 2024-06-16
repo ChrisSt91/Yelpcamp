@@ -7,7 +7,7 @@ const flash = require("connect-flash");
 const cookieParser = require("cookie-parser");
 const joi = require("joi");
 const appError = require("./utils/errorHandling/appError");
-
+const session = require("express-session");
 const app = express();
 
 const campgrounds = require("./routes/campground.js");
@@ -24,11 +24,30 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
-app.use(flash());
 app.use(cookieParser("thisisasecret"));
+app.use(flash());
+
+const sessionConfig = {
+	secret: "thisshouldbeabettersecret",
+	resave: false,
+	saveUninitialized: true,
+	cookie: {
+		httpOnly: true,
+		expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+		maxAge: 1000 * 60 * 60 * 24 * 7,
+	},
+};
+app.use(session(sessionConfig));
+
+app.use((req, res, next) => {
+	res.locals.success = req.flash("success");
+	res.locals.error = req.flash("error");
+	res.locals.danger = req.flash("danger");
+	next();
+});
 
 app.use("/campgrounds", campgrounds);
 app.use("/campgrounds/:id/reviews", reviews);
@@ -46,6 +65,10 @@ app.use((err, req, res, next) => {
 	}
 
 	res.status(status).render("error", { message, status, stack: err.stack, err });
+});
+
+app.use("*", (req, res, next) => {
+	next(new appError("Page Not Found", 404));
 });
 
 app.listen(3000, () => {

@@ -27,6 +27,7 @@ router.post(
 		campground.reviews.push(review);
 		await review.save();
 		await campground.save();
+		req.flash("success", "Created new review");
 		res.redirect(`/campgrounds/${campground._id}`);
 	})
 );
@@ -37,12 +38,9 @@ router.delete(
 		const { id, reviewId } = req.params;
 		await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
 		await Review.findByIdAndDelete(reviewId);
+		req.flash("success", "Review deleted");
 		res.redirect(`/campgrounds/${id}`);
 	})
 );
-
-router.all("*", (req, res, next) => {
-	next(new appError("Page Not Found", 404));
-});
 
 module.exports = router;
