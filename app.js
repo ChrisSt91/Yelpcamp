@@ -9,9 +9,13 @@ const joi = require("joi");
 const appError = require("./utils/errorHandling/appError");
 const session = require("express-session");
 const app = express();
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
 
-const campgrounds = require("./routes/campground.js");
-const reviews = require("./routes/review.js");
+const campgroundRoutes = require("./routes/campground.js");
+const reviewRoutes = require("./routes/review.js");
+const userRoutes = require("./routes/user.js");
 
 main().catch((err) => console.log("OH NO, MONGODB ERROR!", err));
 
@@ -28,7 +32,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(cookieParser("thisisasecret"));
-app.use(flash());
 
 const sessionConfig = {
 	secret: "thisshouldbeabettersecret",
@@ -41,6 +44,14 @@ const sessionConfig = {
 	},
 };
 app.use(session(sessionConfig));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
 	res.locals.success = req.flash("success");
@@ -48,9 +59,6 @@ app.use((req, res, next) => {
 	res.locals.danger = req.flash("danger");
 	next();
 });
-
-app.use("/campgrounds", campgrounds);
-app.use("/campgrounds/:id/reviews", reviews);
 
 app.use((err, req, res, next) => {
 	let status = 500;
@@ -66,6 +74,10 @@ app.use((err, req, res, next) => {
 
 	res.status(status).render("error", { message, status, stack: err.stack, err });
 });
+
+app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/reviews", reviewRoutes);
+app.use("/", userRoutes);
 
 app.use("*", (req, res, next) => {
 	next(new appError("Page Not Found", 404));
