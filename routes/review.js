@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const appError = require("../utils/errorHandling/appError");
 const wrapAsync = require("../utils/wrapAsync");
 const { campgroundSchema, reviewSchema } = require("../schemas");
-
+const isLoggedIn = require("../middleware");
 //Models
 const Review = require("../models/review");
 const Campground = require("../models/campground");
@@ -20,6 +20,7 @@ const validateReview = (req, res, next) => {
 
 router.post(
 	"/",
+	isLoggedIn,
 	validateReview,
 	wrapAsync(async (req, res) => {
 		const campground = await Campground.findById(req.params.id);

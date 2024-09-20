@@ -41,7 +41,6 @@ router.post(
 
 router.get(
 	"/:id",
-	isLoggedIn,
 	wrapAsync(async (req, res, next) => {
 		const campground = await Campground.findById(req.params.id).populate("reviews");
 		if (!campground) {
@@ -81,6 +80,7 @@ router.put(
 
 router.delete(
 	"/:id",
+	isLoggedIn,
 	wrapAsync(async (req, res, next) => {
 		const { id } = req.params;
 		const deletedCamp = await Campground.findByIdAndDelete(id);
