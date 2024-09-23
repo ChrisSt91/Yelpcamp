@@ -9,8 +9,13 @@
 			</div>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item text-muted"><%= campground.location %></li>
+				<li class="list-group-item text-muted">
+					Submitted by:
+					<span style="font-weight: bold"><%= campground.author.username %></span>
+				</li>
 				<li class="list-group-item">£<%= campground.price %>/night</li>
 			</ul>
+			<% if(currentUser && campground.author.equals(currentUser)) { %>
 			<div class="card-body">
 				<a
 					class="card-link btn btn-info"
@@ -25,9 +30,11 @@
 					<button type="submit" class="btn btn-danger">Delete</button>
 				</form>
 			</div>
+			<% } %>
 		</div>
 	</div>
 	<div class="col-6 mt-5">
+		<% if(currentUser) {%>
 		<h2>Leave a Review</h2>
 		<form
 			action="/campgrounds/<%= campground._id %>/reviews"
@@ -78,5 +85,6 @@
 
 			<% } %>
 		</div>
+		<% } %>
 	</div>
 </div>
