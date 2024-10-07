@@ -62,27 +62,27 @@ app.use((req, res, next) => {
 	next();
 });
 
-app.use((err, req, res, next) => {
-	let status = 500;
-	let message = "Something went wrong!";
-
-	if (err instanceof appError) {
-		status = err.status;
-		message = err.message || "Something went wrong";
-	} else if (err.name === "CastError") {
-		status = 400;
-		message = "Cast Failed";
-	}
-
-	res.status(status).render("error", { message, status, stack: err.stack, err });
-});
-
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
 app.use("/", userRoutes);
 
 app.use("*", (req, res, next) => {
 	next(new appError("Page Not Found", 404));
+});
+
+app.use((err, req, res, next) => {
+	let status = 500;
+	let message = "Something went wrong!";
+
+	if (err.name === "CastError") {
+		status = 400;
+		message = "Cast Failed";
+	} else if (err) {
+		status = err.status;
+		message = err.message || "Something went wrong";
+	}
+	res.status(status).render("error", { message, status, stack: err.stack, err });
+	next();
 });
 
 app.listen(3000, () => {
