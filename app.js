@@ -82,11 +82,10 @@ app.use((err, req, res, next) => {
 		status = 400;
 		message = "Cast Failed";
 	} else if (err) {
-		status = err.status;
+		status = err.status || 500;
 		message = err.message || "Something went wrong";
 	}
 	res.status(status).render("error", { message, status, stack: err.stack, err });
-	next();
 });
 
 app.listen(3000, () => {
