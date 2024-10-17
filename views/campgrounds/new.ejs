@@ -30,17 +30,6 @@
 				/>
 			</div>
 			<div class="mb-3">
-				<!-- <label class="form-label" for="image">Image URL</label> -->
-				<input type="file" name="image" id="" multiple />
-				<!-- <input
-					class="form-control"
-					type="text"
-					id="image"
-					name="campground[image]"
-					required
-				/> -->
-			</div>
-			<div class="mb-3">
 				<label class="form-label" for="price">Price</label>
 				<div class="input-group">
 					<span class="input-group-text" id="price-label">£</span>
@@ -66,6 +55,18 @@
 					name="campground[description]"
 					required
 				></textarea>
+			</div>
+			<div class="mb-3">
+				<label for="formFileMultiple" class="form-label" for="image"
+					>Choose Images</label
+				>
+				<input
+					class="form-control"
+					type="file"
+					name="image"
+					id="formFileMultiple"
+					multiple
+				/>
 			</div>
 			<div class="my-2">
 				<button class="btn btn-success">Add Campground</button>
