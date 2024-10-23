@@ -20,6 +20,12 @@ const CampgroundSchema = new Schema({
 	],
 });
 
+CampgroundSchema.path("images")
+	.schema.virtual("thumbnail")
+	.get(function () {
+		return this.url.replace("/upload/", "/upload/w_200/");
+	});
+
 CampgroundSchema.post("findOneAndDelete", async function (doc) {
 	if (doc) {
 		await Review.deleteMany({
