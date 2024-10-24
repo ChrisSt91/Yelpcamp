@@ -1,7 +1,16 @@
 <% layout('layouts/boilerplate') %>
+<script>
+	const maptilerApiKey = <%-
+	process.env.MAPTILER_API_KEY %>
+</script>
 <link rel="stylesheet" href="/stylesheets/stars.css" />
 
 <div class="row">
+	<!-- <iframe
+		width="500"
+		height="300"
+		src="https://api.maptiler.com/maps/basic-v2/?key=o1PqGAQMynhygr5habDy#16.2/53.80075/-1.24133"
+	></iframe> -->
 	<div class="col-6 mt-5">
 		<div id="campgroundCarousel" class="carousel slide" data-ride="carousel">
 			<div class="carousel-inner">
