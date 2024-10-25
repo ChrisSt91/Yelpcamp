@@ -3,6 +3,7 @@ const cities = require("./cities");
 const { places, descriptors } = require("./seedHelpers");
 const Campground = require("../models/campground");
 const Review = require("../models/review");
+const User = require("../models/user");
 main().catch((err) => console.log("OH NO, MONGODB ERROR!", err));
 
 async function main() {
@@ -15,11 +16,12 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)];
 const seedDB = async () => {
 	await Review.deleteMany({});
 	await Campground.deleteMany({});
+	// await User.deleteMany({});
 	for (let i = 0; i < 50; i++) {
 		const random1000 = Math.floor(Math.random() * 1000);
 		const pricing = Math.floor(Math.random() * 20);
 		const camp = new Campground({
-			author: "66ede89a8297ff29de5415f8",
+			author: "671c06c3e5e70ed7cbd49a56",
 			location: `${cities[random1000].city}, ${cities[random1000].state}`,
 			title: `${sample(descriptors)}, ${sample(places)}`,
 			description:
