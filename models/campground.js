@@ -42,6 +42,12 @@ CampgroundSchema.path("images")
 		return this.url.replace("/upload/", "/upload/w_200/");
 	});
 
+CampgroundSchema.virtual("properties.popUpMarkup").get(function () {
+	return `
+		<strong><a href="/campgrounds/${this._id}">${this.title}</a><strong>
+		<p>${this.description.substring(0, 20)}...</p>`;
+});
+
 CampgroundSchema.post("findOneAndDelete", async function (doc) {
 	if (doc) {
 		await Review.deleteMany({
