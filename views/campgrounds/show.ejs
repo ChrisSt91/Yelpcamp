@@ -1,26 +1,10 @@
 <% layout('layouts/boilerplate') %>
 <script>
-	const maptilerApiKey = "<%
-	process.env.MAPTILER_API_KEY %>";
+	const mapToken = "<%-process.env.MAPBOX_TOKEN%>";
+	const campground = <%-JSON.stringify(campground)%>;
 </script>
-<script>
-	const campground = <%- JSON.stringify(campground) %>
-</script>
-<script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.3.0/maptiler-sdk.umd.min.js"></script>
-<link
-	href="https://cdn.maptiler.com/maptiler-sdk-js/v2.3.0/maptiler-sdk.css"
-	rel="stylesheet"
-/>
 <link rel="stylesheet" href="/stylesheets/stars.css" />
-<script>
-	maptilersdk.config.apiKey = "maptilerApiKey";
-	const map = new maptilersdk.Map({
-		container: "map", // container's id or the HTML element in which the SDK will render the map
-		style: maptilersdk.MapStyle.STREETS,
-		center: [16.62662018, 49.2125578], // starting position [lng, lat]
-		zoom: 14, // starting zoom
-	});
-</script>
+<link rel="stylesheet" href="/stylesheets/app.css" />
 <div class="row">
 	<div id="map" style="width: 100%; height: 300px"></div>
 	<div class="col-6 mt-5">
@@ -158,5 +142,4 @@
 		<% } %>
 	</div>
 </div>
-
-<script src="/javascripts/showMapPage.js" defer></script>
+<script src="/javascripts/showPageMap.js"></script>
