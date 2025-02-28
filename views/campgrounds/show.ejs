@@ -127,6 +127,16 @@
 					</p>
 					<p class="card-text">Review: <%= review.body %></p>
 					<% if(currentUser && review.author.equals(currentUser)) { %>
+					<button
+						class="btn btn-sm btn-info edit-review-btn"
+						data-review-id="<%= review._id %>"
+						data-body="
+						<%= review.body
+						%>"
+						data-rating="<%= review.rating %>"
+					>
+						Edit
+					</button>
 					<form
 						action="/campgrounds/<%=campground._id%>/reviews/<%= review._id %>?_method=DELETE"
 						method="POST"
@@ -142,4 +152,89 @@
 		<% } %>
 	</div>
 </div>
+
+<!-- Edit Review Modal -->
+<div
+	class="modal fade"
+	id="editReviewModal"
+	tabindex="-1"
+	aria-labelledby="editReviewModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editReviewModalLabel">Edit Your Review</h5>
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="modal"
+					aria-label="Close"
+				></button>
+			</div>
+			<div class="modal-body">
+				<form id="editReviewForm" method="POST">
+					<fieldset class="starability-basic">
+						<legend>Rating:</legend>
+						<input type="radio" id="edit-rate1" name="review[rating]" value="1" />
+						<label for="edit-rate1" title="Terrible">1 star</label>
+						<input type="radio" id="edit-rate2" name="review[rating]" value="2" />
+						<label for="edit-rate2" title="Not good">2 stars</label>
+						<input type="radio" id="edit-rate3" name="review[rating]" value="3" />
+						<label for="edit-rate3" title="Average">3 stars</label>
+						<input type="radio" id="edit-rate4" name="review[rating]" value="4" />
+						<label for="edit-rate4" title="Very good">4 stars</label>
+						<input type="radio" id="edit-rate5" name="review[rating]" value="5" />
+						<label for="edit-rate5" title="Amazing">5 stars</label>
+					</fieldset>
+
+					<div class="mb-3">
+						<label for="edit-body" class="form-label">Review:</label>
+						<textarea
+							class="form-control"
+							name="review[body]"
+							id="edit-body"
+							rows="3"
+							dir="ltr"
+						></textarea>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Save Changes</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script src="/javascripts/showPageMap.js"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const editButtons = document.querySelectorAll(".edit-review-btn");
+
+		editButtons.forEach((button) => {
+			button.addEventListener("click", function () {
+				const reviewId = this.dataset.reviewId;
+				const reviewBody = this.dataset.body;
+				const reviewRating = this.dataset.rating;
+
+				// Populate modal fields
+				document.getElementById("edit-body").value = reviewBody;
+				document
+					.querySelectorAll('#editReviewModal input[name="review[rating]"]')
+					.forEach((input) => {
+						input.checked = input.value === reviewRating;
+					});
+
+				// Update the form action dynamically
+				const editForm = document.getElementById("editReviewForm");
+				editForm.action = `/campgrounds/<%= campground._id %>/reviews/${reviewId}?_method=PUT`;
+
+				// Show the modal
+				const editModal = new bootstrap.Modal(
+					document.getElementById("editReviewModal")
+				);
+				editModal.show();
+			});
+		});
+	});
+</script>
