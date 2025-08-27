@@ -1,6 +1,6 @@
 <% layout('layouts/boilerplate') %>
+<div id="map" style="width: 100%; height: 500px"></div>
 <h1 class="mt-5 mb-3">All Campgrounds</h1>
-
 <% for (let campground of campgrounds) { %>
 <div class="card mb-3">
 	<div class="row">
@@ -29,3 +29,25 @@
 	</div>
 </div>
 <% } %>
+
+<script>
+	const mapToken = "<%- process.env.MAPBOX_TOKEN %>";
+	const campgrounds = {
+	    type: "FeatureCollection",
+	    features: <%- JSON.stringify(campgrounds.map(c => ({
+	        type: "Feature",
+	        geometry: c.geometry,
+	        properties: {
+	            id: c._id,
+	            title: c.title,
+	            location: c.location
+	        }
+	    }))) %>
+	};
+</script>
+
+<!-- <script>
+	const mapToken = "<%-process.env.MAPBOX_TOKEN%>";
+	const campground = <%-JSON.stringify(campgrounds)%>;
+</script> -->
+<script src="/javascripts/clusterMap.js"></script>

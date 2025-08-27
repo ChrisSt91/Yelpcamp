@@ -1,8 +1,8 @@
 const Campground = require("../models/campground");
 const { cloudinary } = require("../cloudinary");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const mapBoxToken = process.env.MAPBOX_TOKEN;
-const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
+// const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_TOKEN });
 
 module.exports.index = async (req, res, next) => {
 	const campgrounds = await Campground.find({});
@@ -14,21 +14,53 @@ module.exports.renderNewForm = async (req, res, next) => {
 };
 
 module.exports.createCampground = async (req, res, next) => {
-	const geoData = await geocoder
-		.forwardGeocode({
-			query: req.body.campground.location,
-			limit: 1,
-		})
-		.send();
-	const campground = new Campground(req.body.campground);
-	campground.geometry = geoData.body.features[0].geometry;
-	campground.images = req.files.map((f) => ({ url: f.path, filename: f.filename }));
-	campground.author = req.user._id;
-	await campground.save();
-	console.log(campground);
-	req.flash("success", "Successfully made a new campground!");
-	res.redirect(`/campgrounds/${campground._id}`);
+	console.log("Mapbox token:", process.env.MAPBOX_TOKEN);
+	try {
+		const geoData = await geocoder
+			.forwardGeocode({
+				query: req.body.campground.location,
+				limit: 1,
+			})
+			.send();
+
+		if (!geoData.body.features.length) {
+			req.flash("error", "Invalid location");
+			return res.redirect("/campgrounds/new");
+		}
+
+		const campground = new Campground(req.body.campground);
+		campground.geometry = geoData.body.features[0].geometry;
+		campground.images = req.files.map((f) => ({ url: f.path, filename: f.filename }));
+		campground.author = req.user._id;
+
+		await campground.save();
+		console.log("✅ Saved campground:", campground);
+
+		req.flash("success", "Successfully made a new campground!");
+		res.redirect(`/campgrounds/${campground._id}`);
+	} catch (err) {
+		console.error("Error creating campground:", err);
+		req.flash("error", "Something went wrong creating campground");
+		res.redirect("/campgrounds/new");
+	}
 };
+
+// module.exports.createCampground = async (req, res, next) => {
+// 	const geoData = await geocoder
+// 		.forwardGeocode({
+// 			query: req.body.campground.location,
+// 			limit: 1,
+// 		})
+// 		.send();
+// 	const campground = new Campground(req.body.campground);
+// 	campground.geometry = geoData.body.features[0].geometry;
+// 	campground.images = req.files.map((f) => ({ url: f.path, filename: f.filename }));
+// 	campground.author = req.user._id;
+// 	await campground.save();
+// 	req.flash("success", "Successfully made a new campground!");
+// 	console.log(campground);
+// 	res.redirect(`/campgrounds/${campground._id}`);
+// };
 
 module.exports.showCampground = async (req, res, next) => {
 	const campground = await Campground.findById(req.params.id)
